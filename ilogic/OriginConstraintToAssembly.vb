@@ -1,5 +1,5 @@
 Sub Main ()
-
+' This routine runs through your active assembly to apply flush constraint to every origin plane of each ocurrence to those of the current assembly. Create an irule in the ilogic browser and copy and paste this script there to use the routine.
 Dim currentDoc As AssemblyDocument = ThisDoc.Document
 AssemblyOriginCons(currentDoc) 
 	
