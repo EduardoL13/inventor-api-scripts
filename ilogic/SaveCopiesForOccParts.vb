@@ -1,6 +1,5 @@
 Sub Main ()
-' This routines make a "Save As" to all part type occurrences within the assembly and saves them into the path given by the user with a sufix given by the user.
-	
+
 Dim currentDoc As AssemblyDocument = ThisDoc.Document
 Dim fileName As String
 
