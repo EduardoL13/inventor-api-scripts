@@ -7,23 +7,6 @@ Dim inventorParamList As UserParameters = invDoc.ComponentDefinition.Parameters.
 Dim noPDS As Integer = inventorParamList.Count ' Insertar número de parámetros que se desean
 Dim noListPDS As Integer = noPDS - 1 'Número de parámetros para poner en los arrays
 
-'-----------------INPUT----------------------
-
-''Dim nomParametersForDS(noListPDS) As String ' Listado de nombres de parámetros que se quieren escribir en el DS
-'Dim writeParamsList(noListPDS) As Object
-''MsgBox(writeParamsList.Length)
-
-''---------------------------------------------
-
-''Dim writeParamsList As ReferenceParameter = inventorParamList.Item(nomParametersForDS) 'Genera listado de parámetros vacío
-
-'Dim i As Integer
-
-'For i=0 To writeParamsList.Length-1
-'    writeParamsList(i) = inventorParamList.Item(i+1) 'llena el listado de los parámetros que se quieren 
-'Next
-
-' Target file to write the parameter
 
 Dim file As String
 Dim tab As String
@@ -107,3 +90,4 @@ Function getDS(activeDoc As Object)
 	
 	
 End Function
+
