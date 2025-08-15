@@ -1,0 +1,104 @@
+Sub Main ()
+
+	Dim esteDoc As PartDocument = ThisDoc.Document
+	Dim sFile As String
+	Dim tabDS As String
+    Dim outputForDS = getDS(esteDoc)
+	sFile = outputForDS(0)
+	tabDS = "EIKP"
+	'-----------------------------------------------------------------------------------------------------
+	Dim compMB As PartComponentDefinition = esteDoc.ComponentDefinition 
+
+	Dim EndDataRow As Integer =  findLastDataRow(sFile,tabDS) 
+    userParamGen(compMB, sFile, EndDataRow,tabDS)
+	iLogicVb.UpdateWhenDone = True
+	MsgBox("Key Parameters have been imported")
+
+End Sub
+
+Sub userParamGen(partMB As ComponentDefinition,file As String,infoEnd As Integer, tab As String)
+	Dim infoStart As Integer = 2 ' índice de row a partir del cual hay info
+	Dim rowCounter As Integer = infoStart
+	Dim nombreVar As String = ""
+	Dim valor As String = ""
+	
+	If partMB.Parameters.UserParameters.count = 0
+        While rowCounter < infoEnd 
+		    nombreVar = GoExcel.CellValue(file, tab, "A" & rowCounter)
+		    valor = GoExcel.CellValue(file, tab, "B" & rowCounter)
+		    partMB.Parameters.UserParameters.AddByExpression(nombreVar, valor, GoExcel.CellValue(file, tab, "C" & rowCounter))
+	        rowCounter = rowCounter + 1 
+	    End While 'Al final de este While, se crean los parámetros en caso no exista ninguno
+	Else
+        While rowCounter < infoEnd
+			Dim repCount As Integer = 0
+			nombreVar = GoExcel.CellValue(file, tab, "A" & rowCounter)
+		    For Each uPar As UserParameter In partMB.Parameters.UserParameters
+			    If uPar.Name = nombreVar
+					uPar.Expression = GoExcel.CellValue(file, tab, "B" & rowCounter)
+                    repCount = repCount+1
+				End If ' Verifica si la expresión existe, y la actualiza la expresión 
+			Next
+			    If repCount = 0 Then
+				    valor = GoExcel.CellValue(file, tab, "B" & rowCounter)
+		            partMB.Parameters.UserParameters.AddByExpression(nombreVar, valor, GoExcel.CellValue(file, tab, "C" & rowCounter))    
+				End If '
+	    rowCounter = rowCounter + 1
+		repCount = 0
+	    End While
+	End If
+	
+	
+End Sub
+
+Function findLastDataRow(file As String, tab As String)
+	Dim cellVal As Object 
+	Dim range As Integer = 1000
+	Dim lastDataRow As Integer = 0
+    For rowNum As Integer = 1 To range
+		cellVal = GoExcel.CellValue(file, tab, "A" & rowNum)
+	    If cellVal Is Nothing  Then '(cellVal Is Nothing OrElse String.IsNullOrEmpty(cellVal.ToString()))
+			If (rowNum > range) Then Exit For
+	    Else
+			lastDataRow = rowNum + 1
+		End If
+	Next
+	Return lastDataRow
+End Function
+
+
+Function LoadDSComms(defDoc As Object, stringToLoad As String)
+    If stringToLoad = "worksheet" Then
+        iLogicVb.RunRule("LoadWorkSheetName")
+		Dim oPropSet As PropertySet = defDoc.PropertySets.Item("DS Data")
+		Dim tabDS As String = oPropSet.Item(1).Value
+    	Return tabDS
+	Else If stringToLoad = "path"
+		iLogicVb.RunRule("LoadFilePath")
+		Dim oPropSet As PropertySet = defDoc.PropertySets.Item("Path Data")
+		Dim pathName As String = oPropSet.Item(1).Value
+    	Return pathName
+	Else
+		MsgBox("Input inválido")
+	End If
+End Function
+
+Function getDS(activeDoc As Object)
+	
+	Dim ruta As String = LoadDSComms(activeDoc,"path")
+    'MsgBox(ruta)
+	
+    Dim pathSufixDS As String = "DS.xlsx"
+	Dim workSheetDS As String = LoadDSComms(activeDoc,"worksheet")
+	
+	Dim sFile As String = ruta & pathSufixDS
+    Dim tabDS As String = workSheetDS
+	
+	Dim outputForDS(1) As String
+	outputForDS(0) = sFile
+	outputForDS(1) = tabDS
+	
+	Return outputForDS
+	
+	
+End Function
